@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .welcome {
+    display: flex;
+    align-items: center; /* Vertically center the image and text */
+}
+
+.user-photo {
+    width: 80px; /* Adjust width as needed */
+    height: 80px; /* Adjust height as needed */
+    border-radius: 50%; /* Makes the image circular */
+    margin-right: 15px; /* Space between the image and text */
+}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* Mengatur body untuk menggunakan flexbox */
+        }
+        h1, h2 {
+            text-align: flex;
+        }
+        .container {
+            flex: 1; /* Membiarkan kontainer utama mengambil sisa ruang */
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        nav {
+            width: 200px; /* Menentukan lebar navbar */
+            background: #fff; /* Warna latar belakang navbar */
+            padding: 10px; /* Menambahkan padding pada navbar */
+            border-right: 1px solid #ccc; /* Menambahkan garis batas kanan */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Menambahkan bayangan */
+        }
+        nav a {
+            display: block; /* Mengubah link menjadi block agar tidak ada jarak antar tombol */
+            width: 80%; /* Membuat link memenuhi lebar navbar */
+            margin-bottom: 10px; /* Menambahkan jarak antar tombol */
+            text-decoration: none; /* Menghilangkan garis bawah */
+            color: white; /* Warna teks putih */
+            background-color: #5cb85c; /* Warna latar belakang tombol */
+            padding: 10px 15px; /* Padding tombol */
+            border-radius: 5px; /* Sudut membulat */
+            text-align: center; /* Menyusun teks ke tengah */
+        }
+        nav a:hover {
+            background-color: #4cae4c; /* Warna latar belakang saat hover */
+        }
+        .content {
+            flex: 1; /* Membiarkan konten utama mengambil sisa ruang */
+            padding: 20px; /* Menambahkan padding pada konten utama */
+        }
+        iframe {
+            width: 100%; /* Lebar iframe 100% dari kontainer */
+            height: 600px; /* Tinggi iframe */
+            border: none; /* Tanpa border */
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="welcome">
+            <img src="ahda.png" alt="User Photo" class="user-photo">
+            <div>
+                <h1>Welcome, Januardy Ahda</h1>
+                <p>Administrator</p>
+            </div>
+        </div>
+        <a href="dashboard.html" target="contentFrame">Dashboard</a>
+        <h2>Menu Karyawan</h2>
+        <a href="karyawan.html" target="contentFrame">Karyawan</a>
+        <a href="jabatan.html" target="contentFrame">Jabatan</a>
+        <a href="divisi.html" target="contentFrame">Divisi</a>
+        <h2>Menu Absensi</h2>
+        <a href="absensi.html" target="contentFrame">Absensi</a>
+        <a href="izin.html" target="contentFrame">Izin</a>
+        <a href="lembur.html" target="contentFrame">Lembur</a>
+    </nav>
+    
+
+    <div class="container content">
+        <iframe name="contentFrame" src="dashboard.html"></iframe>
+    </div>
+
+</body>
+</html>

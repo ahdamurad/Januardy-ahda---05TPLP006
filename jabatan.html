@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Jabatan Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Jabatan Karyawan</h1>
+        <button onclick="showForm('formJabatan')">Tambah Jabatan</button>
+        
+        <div id="formJabatan" style="display: none;">
+            <h3 id="formTitle">Tambah Jabatan</h3>
+            <form onsubmit="saveJabatan(event)">
+                <input type="hidden" id="kodeJabatan">
+                <input type="text" id="namaJabatan" placeholder="Nama Jabatan" required>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formJabatan')">Batal</button>
+            </form>
+        </div>
+
+        <table id="tableJabatan">
+            <thead>
+                <tr>
+                    <th>Kode Jabatan</th>
+                    <th>Nama Jabatan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Jabatan akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById('kodeJabatan').value = '';
+            document.getElementById('namaJabatan').value = '';
+            document.getElementById('formTitle').innerText = 'Tambah Jabatan';
+        }
+
+        function saveJabatan(event) {
+            event.preventDefault();
+            const kode = document.getElementById('kodeJabatan').value;
+            const nama = document.getElementById('namaJabatan').value;
+
+            let jabatanList = JSON.parse(localStorage.getItem('jabatanList')) || [];
+
+            if (kode) { // Edit mode
+                jabatanList = jabatanList.map(jabatan => {
+                    if (jabatan.kode === kode) {
+                        return { kode, nama }; // Update existing jabatan
+                    }
+                    return jabatan;
+                });
+            } else { // Add mode
+                const newKode = 'JAB' + String(jabatanList.length + 1).padStart(3, '0');
+                jabatanList.push({ kode: newKode, nama }); // Add new jabatan
+            }
+
+            localStorage.setItem('jabatanList', JSON.stringify(jabatanList));
+            displayJabatan();
+            hideForm('formJabatan');
+        }
+
+        function displayJabatan() {
+            const jabatanList = JSON.parse(localStorage.getItem('jabatanList')) || [];
+            const tbody = document.querySelector('#tableJabatan tbody');
+            tbody.innerHTML = '';
+
+            jabatanList.forEach(jabatan => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = jabatan.kode;
+                row.insertCell(1).innerText = jabatan.nama;
+
+                const actionCell = row.insertCell(2);
+                
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => editJabatan(jabatan.kode);
+                actionCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteJabatan(jabatan.kode);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function editJabatan(kode) {
+            const jabatanList = JSON.parse(localStorage.getItem('jabatanList')) || [];
+            const jabatanToEdit = jabatanList.find(jabatan => jabatan.kode === kode);
+            if (jabatanToEdit) {
+                document.getElementById('kodeJabatan').value = jabatanToEdit.kode;
+                document.getElementById('namaJabatan').value = jabatanToEdit.nama;
+                document.getElementById('formTitle').innerText = 'Edit Jabatan';
+                showForm('formJabatan');
+            }
+        }
+
+        function deleteJabatan(kode) {
+            let jabatanList = JSON.parse(localStorage.getItem('jabatanList')) || [];
+            jabatanList = jabatanList.filter(jabatan => jabatan.kode !== kode);
+            localStorage.setItem('jabatanList', JSON.stringify(jabatanList));
+            displayJabatan();
+        }
+
+        document.addEventListener('DOMContentLoaded', displayJabatan);
+    </script>
+</body>
+</html>

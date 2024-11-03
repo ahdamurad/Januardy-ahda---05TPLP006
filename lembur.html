@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembur Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Lembur Karyawan</h1>
+        <button onclick="showForm('formLembur')">Tambah Lembur</button>
+        <div id="formLembur" style="display: none;">
+            <h3>Tambah Lembur</h3>
+            <form onsubmit="addLembur(event)">
+                <input type="text" id="namaKaryawanLembur" placeholder="Nama Karyawan" required>
+                <input type="date" id="tanggalLembur" required>
+                <input type="time" id="jamMasukLembur" required placeholder="Jam Masuk">
+                <input type="time" id="jamKeluarLembur" required placeholder="Jam Keluar">
+                <input type="text" id="keperluanLembur" placeholder="Keperluan Lembur" required>
+                <select id="statusLembur" required>
+                    <option value="">Pilih Status</option>
+                    <option value="disetujui">Disetujui</option>
+                    <option value="ditolak">Ditolak</option>
+                    <option value="pending">Pending</option>
+                </select>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formLembur')">Batal</button>
+            </form>
+        </div>
+        <table id="tableLembur">
+            <thead>
+                <tr>
+                    <th>ID Lembur</th>
+                    <th>Nama Karyawan</th>
+                    <th>Tanggal</th>
+                    <th>Jam Masuk</th>
+                    <th>Jam Keluar</th>
+                    <th>Keperluan Lembur</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Lembur akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function addLembur(event) {
+            event.preventDefault();
+            const nama = document.getElementById('namaKaryawanLembur').value;
+            const tanggal = document.getElementById('tanggalLembur').value;
+            const jamMasuk = document.getElementById('jamMasukLembur').value;
+            const jamKeluar = document.getElementById('jamKeluarLembur').value;
+            const keperluan = document.getElementById('keperluanLembur').value;
+            const status = document.getElementById('statusLembur').value;
+
+            let lemburList = JSON.parse(localStorage.getItem('lemburList')) || [];
+            const newLembur = {
+                id: lemburList.length ? lemburList[lemburList.length - 1].id + 1 : 1,
+                nama,
+                tanggal,
+                jamMasuk,
+                jamKeluar,
+                keperluan,
+                status
+            };
+
+            lemburList.push(newLembur);
+            localStorage.setItem('lemburList', JSON.stringify(lemburList));
+            displayLembur();
+            hideForm('formLembur');
+            document.getElementById('namaKaryawanLembur').value = '';
+            document.getElementById('tanggalLembur').value = '';
+            document.getElementById('jamMasukLembur').value = '';
+            document.getElementById('jamKeluarLembur').value = '';
+            document.getElementById('keperluanLembur').value = '';
+            document.getElementById('statusLembur').value = '';
+        }
+
+        function displayLembur() {
+            const lemburList = JSON.parse(localStorage.getItem('lemburList')) || [];
+            const tbody = document.querySelector('#tableLembur tbody');
+            tbody.innerHTML = '';
+
+            lemburList.forEach(lembur => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = lembur.id;
+                row.insertCell(1).innerText = lembur.nama;
+                row.insertCell(2).innerText = lembur.tanggal;
+                row.insertCell(3).innerText = lembur.jamMasuk;
+                row.insertCell(4).innerText = lembur.jamKeluar;
+                row.insertCell(5).innerText = lembur.keperluan;
+                row.insertCell(6).innerText = lembur.status;
+
+                const actionCell = row.insertCell(7);
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteLembur(lembur.id);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function deleteLembur(id) {
+            let lemburList = JSON.parse(localStorage.getItem('lemburList')) || [];
+            lemburList = lemburList.filter(lembur => lembur.id !== id);
+            localStorage.setItem('lemburList', JSON.stringify(lemburList));
+            displayLembur();
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+        }
+
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', displayLembur);
+    </script>
+</body>
+</html>

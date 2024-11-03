@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Karyawan</h1>
+        <button onclick="showForm('formKaryawan')">Tambah Karyawan</button>
+        
+        <div id="formKaryawan" style="display: none;">
+            <h3 id="formTitle">Tambah Karyawan</h3>
+            <form onsubmit="saveKaryawan(event)">
+                <input type="hidden" id="karyawanId">
+                <input type="text" id="namaKaryawan" placeholder="Nama Karyawan" required>
+                <input type="text" id="jabatanKaryawan" placeholder="Jabatan" required>
+                <input type="email" id="emailKaryawan" placeholder="Email" required>
+                <input type="text" id="alamatKaryawan" placeholder="Alamat" required>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formKaryawan')">Batal</button>
+            </form>
+        </div>
+
+        <table id="tableKaryawan">
+            <thead>
+                <tr>
+                    <th>Kode</th>
+                    <th>Karyawan</th>
+                    <th>Jabatan</th>
+                    <th>Email</th>
+                    <th>Alamat</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Karyawan akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('karyawanId').value = '';
+            document.getElementById('namaKaryawan').value = '';
+            document.getElementById('jabatanKaryawan').value = '';
+            document.getElementById('emailKaryawan').value = '';
+            document.getElementById('alamatKaryawan').value = '';
+            document.getElementById('formTitle').innerText = 'Tambah Karyawan';
+        }
+
+        function saveKaryawan(event) {
+            event.preventDefault();
+            const id = document.getElementById('karyawanId').value;
+            const nama = document.getElementById('namaKaryawan').value;
+            const jabatan = document.getElementById('jabatanKaryawan').value;
+            const email = document.getElementById('emailKaryawan').value;
+            const alamat = document.getElementById('alamatKaryawan').value;
+
+            let karyawanList = JSON.parse(localStorage.getItem('karyawanList')) || [];
+            if (id) {
+                // Edit Karyawan
+                const index = karyawanList.findIndex(karyawan => karyawan.id == id);
+                if (index !== -1) {
+                    karyawanList[index] = { id: parseInt(id), nama, jabatan, email, alamat };
+                }
+            } else {
+                // Tambah Karyawan
+                const newKaryawan = {
+                    id: karyawanList.length ? karyawanList[karyawanList.length - 1].id + 1 : 1,
+                    nama,
+                    jabatan,
+                    email,
+                    alamat
+                };
+                karyawanList.push(newKaryawan);
+            }
+
+            localStorage.setItem('karyawanList', JSON.stringify(karyawanList));
+            displayKaryawan();
+            hideForm('formKaryawan');
+        }
+
+        function editKaryawan(id) {
+            const karyawanList = JSON.parse(localStorage.getItem('karyawanList')) || [];
+            const karyawan = karyawanList.find(k => k.id === id);
+            if (karyawan) {
+                document.getElementById('karyawanId').value = karyawan.id;
+                document.getElementById('namaKaryawan').value = karyawan.nama;
+                document.getElementById('jabatanKaryawan').value = karyawan.jabatan;
+                document.getElementById('emailKaryawan').value = karyawan.email;
+                document.getElementById('alamatKaryawan').value = karyawan.alamat;
+                document.getElementById('formTitle').innerText = 'Edit Karyawan';
+                showForm('formKaryawan');
+            }
+        }
+
+        function displayKaryawan() {
+            const karyawanList = JSON.parse(localStorage.getItem('karyawanList')) || [];
+            const tbody = document.querySelector('#tableKaryawan tbody');
+            tbody.innerHTML = '';
+
+            karyawanList.forEach(karyawan => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = karyawan.id;
+                row.insertCell(1).innerText = karyawan.nama;
+                row.insertCell(2).innerText = karyawan.jabatan;
+                row.insertCell(3).innerText = karyawan.email;
+                row.insertCell(4).innerText = karyawan.alamat;
+
+                const actionCell = row.insertCell(5);
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => editKaryawan(karyawan.id);
+                actionCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteKaryawan(karyawan.id);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function deleteKaryawan(id) {
+            let karyawanList = JSON.parse(localStorage.getItem('karyawanList')) || [];
+            karyawanList = karyawanList.filter(karyawan => karyawan.id !== id);
+            localStorage.setItem('karyawanList', JSON.stringify(karyawanList));
+            displayKaryawan();
+        }
+
+        document.addEventListener('DOMContentLoaded', displayKaryawan);
+    </script>
+</body>
+</html>

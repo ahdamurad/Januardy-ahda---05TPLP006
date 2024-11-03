@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Absensi Karyawan</h1>
+        <button onclick="showForm('formAbsensi')">Tambah Absensi</button>
+        <div id="formAbsensi" style="display: none;">
+            <h3>Tambah Absensi</h3>
+            <form onsubmit="addAbsensi(event)">
+                <input type="text" id="namaKaryawanAbsensi" placeholder="Nama Karyawan" required>
+                <input type="date" id="tanggalAbsensi" required>
+                <input type="text" id="lokasiAbsensi" placeholder="Lokasi" required>
+                <input type="time" id="jamMasukAbsensi" required>
+                <input type="time" id="jamKeluarAbsensi" required>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formAbsensi')">Batal</button>
+            </form>
+        </div>
+        <table id="tableAbsensi">
+            <thead>
+                <tr>
+                    <th>ID Absensi</th>
+                    <th>Nama Karyawan</th>
+                    <th>Tanggal</th>
+                    <th>Lokasi</th>
+                    <th>Jam Masuk</th>
+                    <th>Jam Keluar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Absensi akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function addAbsensi(event) {
+            event.preventDefault();
+            const nama = document.getElementById('namaKaryawanAbsensi').value;
+            const tanggal = document.getElementById('tanggalAbsensi').value;
+            const lokasi = document.getElementById('lokasiAbsensi').value;
+            const jamMasuk = document.getElementById('jamMasukAbsensi').value;
+            const jamKeluar = document.getElementById('jamKeluarAbsensi').value;
+
+            let absensiList = JSON.parse(localStorage.getItem('absensiList')) || [];
+            const newAbsensi = {
+                id: absensiList.length ? absensiList[absensiList.length - 1].id + 1 : 1,
+                nama,
+                tanggal,
+                lokasi,
+                jamMasuk,
+                jamKeluar
+            };
+
+            absensiList.push(newAbsensi);
+            localStorage.setItem('absensiList', JSON.stringify(absensiList));
+            displayAbsensi();
+            hideForm('formAbsensi');
+            document.getElementById('namaKaryawanAbsensi').value = '';
+            document.getElementById('tanggalAbsensi').value = '';
+            document.getElementById('lokasiAbsensi').value = '';
+            document.getElementById('jamMasukAbsensi').value = '';
+            document.getElementById('jamKeluarAbsensi').value = '';
+        }
+
+        function displayAbsensi() {
+            const absensiList = JSON.parse(localStorage.getItem('absensiList')) || [];
+            const tbody = document.querySelector('#tableAbsensi tbody');
+            tbody.innerHTML = '';
+
+            absensiList.forEach(absensi => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = absensi.id;
+                row.insertCell(1).innerText = absensi.nama;
+                row.insertCell(2).innerText = absensi.tanggal;
+                row.insertCell(3).innerText = absensi.lokasi;
+                row.insertCell(4).innerText = absensi.jamMasuk;
+                row.insertCell(5).innerText = absensi.jamKeluar;
+
+                const actionCell = row.insertCell(6);
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteAbsensi(absensi.id);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function deleteAbsensi(id) {
+            let absensiList = JSON.parse(localStorage.getItem('absensiList')) || [];
+            absensiList = absensiList.filter(absensi => absensi.id !== id);
+            localStorage.setItem('absensiList', JSON.stringify(absensiList));
+            displayAbsensi();
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+        }
+
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', displayAbsensi);
+    </script>
+</body>
+</html>

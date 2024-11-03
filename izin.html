@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Izin Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Izin Karyawan</h1>
+        <button onclick="showForm('formIzin')">Tambah Izin</button>
+        <div id="formIzin" style="display: none;">
+            <h3>Tambah Izin</h3>
+            <form onsubmit="addIzin(event)">
+                <input type="text" id="namaKaryawanIzin" placeholder="Nama Karyawan" required>
+                <input type="text" id="jenisIzin" placeholder="Jenis Izin" required>
+                <input type="date" id="tanggalIzin" required>
+                <input type="time" id="jamIzin" required>
+                <input type="text" id="keteranganIzin" placeholder="Keterangan" required>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formIzin')">Batal</button>
+            </form>
+        </div>
+        <table id="tableIzin">
+            <thead>
+                <tr>
+                    <th>ID Izin</th>
+                    <th>Nama Karyawan</th>
+                    <th>Jenis Izin</th>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>Keterangan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Izin akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function addIzin(event) {
+            event.preventDefault();
+            const nama = document.getElementById('namaKaryawanIzin').value;
+            const jenis = document.getElementById('jenisIzin').value;
+            const tanggal = document.getElementById('tanggalIzin').value;
+            const jam = document.getElementById('jamIzin').value;
+            const keterangan = document.getElementById('keteranganIzin').value;
+
+            let izinList = JSON.parse(localStorage.getItem('izinList')) || [];
+            const newIzin = {
+                id: izinList.length ? izinList[izinList.length - 1].id + 1 : 1,
+                nama,
+                jenis,
+                tanggal,
+                jam,
+                keterangan
+            };
+
+            izinList.push(newIzin);
+            localStorage.setItem('izinList', JSON.stringify(izinList));
+            displayIzin();
+            hideForm('formIzin');
+            document.getElementById('namaKaryawanIzin').value = '';
+            document.getElementById('jenisIzin').value = '';
+            document.getElementById('tanggalIzin').value = '';
+            document.getElementById('jamIzin').value = '';
+            document.getElementById('keteranganIzin').value = '';
+        }
+
+        function displayIzin() {
+            const izinList = JSON.parse(localStorage.getItem('izinList')) || [];
+            const tbody = document.querySelector('#tableIzin tbody');
+            tbody.innerHTML = '';
+
+            izinList.forEach(izin => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = izin.id;
+                row.insertCell(1).innerText = izin.nama;
+                row.insertCell(2).innerText = izin.jenis;
+                row.insertCell(3).innerText = izin.tanggal;
+                row.insertCell(4).innerText = izin.jam;
+                row.insertCell(5).innerText = izin.keterangan;
+
+                const actionCell = row.insertCell(6);
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteIzin(izin.id);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function deleteIzin(id) {
+            let izinList = JSON.parse(localStorage.getItem('izinList')) || [];
+            izinList = izinList.filter(izin => izin.id !== id);
+            localStorage.setItem('izinList', JSON.stringify(izinList));
+            displayIzin();
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+        }
+
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', displayIzin);
+    </script>
+</body>
+</html>

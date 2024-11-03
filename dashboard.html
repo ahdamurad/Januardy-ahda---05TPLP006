@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .box {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: calc(25% - 20px);
+        }
+        h3 {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dashboard</h1>
+    <div class="dashboard">
+        <div class="box">
+            <h3>Data Pegawai</h3>
+            <p id="dataPegawaiCount">0</p>
+        </div>
+        <div class="box">
+            <h3>Absensi</h3>
+            <p id="absensiCount">0</p>
+        </div>
+        <div class="box">
+            <h3>Izin</h3>
+            <p id="izinCount">0</p>
+        </div>
+        <div class="box">
+            <h3>Lembur</h3>
+            <p id="lemburCount">0</p>
+        </div>
+    </div>
+
+    <script>
+        function updateDashboard() {
+            // Mengambil data dari localStorage
+            const absensiList = JSON.parse(localStorage.getItem('absensiList')) || [];
+            const pegawaiList = JSON.parse(localStorage.getItem('karyawanList')) || [];
+            const izinList = JSON.parse(localStorage.getItem('izinList')) || [];
+            const lemburList = JSON.parse(localStorage.getItem('lemburList')) || [];
+
+            // Menampilkan jumlah data pada dashboard
+            document.getElementById('absensiCount').innerText = absensiList.length;
+            document.getElementById('dataPegawaiCount').innerText = pegawaiList.length;
+            document.getElementById('izinCount').innerText = izinList.length;
+            document.getElementById('lemburCount').innerText = lemburList.length;
+        }
+
+        // Memanggil fungsi untuk memperbarui dashboard saat halaman dimuat
+        updateDashboard();
+    </script>
+</body>
+</html>

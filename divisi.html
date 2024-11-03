@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Divisi Karyawan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Data Divisi Karyawan</h1>
+        <button onclick="showForm('formDivisi')">Tambah Divisi</button>
+        
+        <div id="formDivisi" style="display: none;">
+            <h3 id="formTitle">Tambah Divisi</h3>
+            <form onsubmit="saveDivisi(event)">
+                <input type="hidden" id="kodeDivisi">
+                <input type="text" id="namaDivisi" placeholder="Nama Divisi" required>
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="hideForm('formDivisi')">Batal</button>
+            </form>
+        </div>
+
+        <table id="tableDivisi">
+            <thead>
+                <tr>
+                    <th>Kode Divisi</th>
+                    <th>Nama Divisi</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data Divisi akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            document.getElementById(formId).style.display = 'block';
+        }
+
+        function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById('kodeDivisi').value = '';
+            document.getElementById('namaDivisi').value = '';
+            document.getElementById('formTitle').innerText = 'Tambah Divisi';
+        }
+
+        function saveDivisi(event) {
+            event.preventDefault();
+            const kode = document.getElementById('kodeDivisi').value;
+            const nama = document.getElementById('namaDivisi').value;
+
+            let divisiList = JSON.parse(localStorage.getItem('divisiList')) || [];
+
+            if (kode) { // Edit mode
+                divisiList = divisiList.map(divisi => {
+                    if (divisi.kode === kode) {
+                        return { kode, nama }; // Update existing division
+                    }
+                    return divisi;
+                });
+            } else { // Add mode
+                const newKode = 'DIV' + String(divisiList.length + 1).padStart(3, '0');
+                divisiList.push({ kode: newKode, nama }); // Add new division
+            }
+
+            localStorage.setItem('divisiList', JSON.stringify(divisiList));
+            displayDivisi();
+            hideForm('formDivisi');
+        }
+
+        function displayDivisi() {
+            const divisiList = JSON.parse(localStorage.getItem('divisiList')) || [];
+            const tbody = document.querySelector('#tableDivisi tbody');
+            tbody.innerHTML = '';
+
+            divisiList.forEach(divisi => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = divisi.kode;
+                row.insertCell(1).innerText = divisi.nama;
+
+                const actionCell = row.insertCell(2);
+                
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => editDivisi(divisi.kode);
+                actionCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Hapus';
+                deleteButton.onclick = () => deleteDivisi(divisi.kode);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function editDivisi(kode) {
+            const divisiList = JSON.parse(localStorage.getItem('divisiList')) || [];
+            const divisiToEdit = divisiList.find(divisi => divisi.kode === kode);
+            if (divisiToEdit) {
+                document.getElementById('kodeDivisi').value = divisiToEdit.kode;
+                document.getElementById('namaDivisi').value = divisiToEdit.nama;
+                document.getElementById('formTitle').innerText = 'Edit Divisi';
+                showForm('formDivisi');
+            }
+        }
+
+        function deleteDivisi(kode) {
+            let divisiList = JSON.parse(localStorage.getItem('divisiList')) || [];
+            divisiList = divisiList.filter(divisi => divisi.kode !== kode);
+            localStorage.setItem('divisiList', JSON.stringify(divisiList));
+            displayDivisi();
+        }
+
+        document.addEventListener('DOMContentLoaded', displayDivisi);
+    </script>
+</body>
+</html>
